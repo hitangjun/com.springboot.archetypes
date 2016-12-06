@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <context:property-placeholder ignore-unresolvable="true" />
+
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="poolName" value="springHikariCP" />
+        <property name="connectionTestQuery" value="SELECT 1" />
+        <property name="maximumPoolSize" value="50" />
+        <!-- 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒 -->
+        <property name="connectionTimeout" value="30000" />
+        <!-- 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟 -->
+        <property name="idleTimeout" value="600000" />
+        <!-- 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，
+        参考MySQL wait_timeout参数（show variables like '%timeout%';） -->
+        <property name="maxLifetime" value="1800000" />
+        <property name="driverClassName" value="${spring.datasource.driver-class-name}" />
+        <property name="jdbcUrl" value="${spring.datasource.url}"/>
+        <property name="username" value="${spring.datasource.username}"/>
+        <property name="password" value="${spring.datasource.password}"/>
+    </bean>
+
+    <!-- HikariCP configuration -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="shutdown">
+        <constructor-arg ref="hikariConfig" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:spring/mybatis-config.xml"/>
+        <property name="typeAliasesPackage" value="${package}.domain"/>
+        <!-- 配置扫描Mapper XML的位置 -->
+        <property name="mapperLocations" value="classpath:mybatis/*.xml"/>
+    </bean>
+
+    <!-- 配置扫描Mapper接口的包路径 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="${package}.mapper"/>
+    </bean>
+
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="true" />
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager" >
+        <tx:attributes>
+            <tx:method name="start*" propagation="REQUIRED"/>
+            <tx:method name="submit*" propagation="REQUIRED"/>
+            <tx:method name="clear*" propagation="REQUIRED"/>
+            <tx:method name="create*" propagation="REQUIRED"/>
+            <tx:method name="activate*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            <tx:method name="execute*" propagation="REQUIRED"/>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config proxy-target-class="true" expose-proxy="true">
+        <aop:pointcut id="pt" expression="execution(public * ${package}.service.*.*(..))" />
+        <aop:advisor order="200" pointcut-ref="pt" advice-ref="txAdvice"/>
+    </aop:config>
+</beans>

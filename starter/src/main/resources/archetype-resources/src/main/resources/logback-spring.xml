@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+<include resource="org/springframework/boot/logging/logback/base.xml" />
+
+<springProfile name="production">
+    <appender name="SystemRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>/logs/springboot.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/springboot.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <maxHistory>3000</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+        </encoder>
+    </appender>
+    <appender name="SqlLogRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>/logs/sql/sql.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/sql/sql.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <maxHistory>3000</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+        </encoder>
+    </appender>
+</springProfile>
+
+<springProfile name="development">
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</springProfile>
+
+<springProfile name="production">
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="SystemRollingFileAppender" />
+    </root>
+</springProfile>
+
+<logger name="mapper" level="DEBUG" >
+    <appender-ref ref="SqlLogRollingFileAppender" />
+</logger>
+</configuration>
+
