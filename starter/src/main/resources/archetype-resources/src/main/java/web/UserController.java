@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-/**
- * @author JohnTang
- * @date 2016/12/1
- */
 @RestController //默认代替@Controller + @ResponseBody
 @RequestMapping(value = "/users")     // 通过这里配置使下面的映射都在/users下
 public class UserController {

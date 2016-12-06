@@ -2,10 +2,7 @@ package ${package}.domain;
 
 import org.springframework.data.annotation.Id;
 
-/**
- * @author JohnTang
- * @date 2016/12/1
- */
+
 public class User {
     @Id
     private Long id;

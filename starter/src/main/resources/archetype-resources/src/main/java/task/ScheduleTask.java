@@ -6,10 +6,6 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * @author JohnTang
- * @date 2016/12/2
- */
 @Component
 public class ScheduleTask {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");

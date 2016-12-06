@@ -1,9 +1,5 @@
 package ${package}.handler;
 
-/**
- * @author JohnTang
- * @date 2016/12/1
- */
 public class ErrorInfo<T> {
     public static final Integer OK = 0;
     public static final Integer ERROR = 100;

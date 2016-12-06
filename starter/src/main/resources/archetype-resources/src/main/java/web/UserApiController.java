@@ -11,10 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author JohnTang
- * @date 2016/12/1
- */
 @RestController
 @RequestMapping(value = "/usersapi")     // 通过这里配置使下面的映射都在/users下，可去除
 public class UserApiController {
